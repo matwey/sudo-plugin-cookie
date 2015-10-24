@@ -9,6 +9,15 @@ struct policy_plugin_state state;
 
 int policy_open(unsigned int version, sudo_conv_t conversation, sudo_printf_t plugin_printf, char * const settings[], char * const user_info[], char * const user_env[], char * const plugin_options[]) {
 	state.plugin_printf = plugin_printf;
+
+	if (SUDO_API_VERSION_GET_MAJOR(version) != SUDO_API_VERSION_MAJOR) {
+		plugin_printf(SUDO_CONV_ERROR_MSG, "Cookie plugin requires API version %d.x (%d.%d is available)\n",
+			SUDO_API_VERSION_MAJOR,
+			SUDO_API_VERSION_GET_MAJOR(version),
+			SUDO_API_VERSION_GET_MINOR(version));
+		return -1;
+	}
+
 	return 1;
 }
 void policy_close(int exit_status, int error) {
