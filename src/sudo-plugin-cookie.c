@@ -11,11 +11,12 @@
 #include "env.h"
 #include "path.h"
 
-#define COOKIE_FILE "cookie.txt"
+const char default_cookie_file[] = "/etc/sudo-plugin-cookie";
 
 struct policy_plugin_state {
 	sudo_printf_t plugin_printf;
 	char* const* plugin_arge;
+	char* cookie_file;
 };
 
 struct policy_plugin_state state;
@@ -26,6 +27,11 @@ char* load_cookie_from_file(const char* filename) {
 	struct stat st;
 	int ret,fd;
 	size_t i,j;
+
+	if(filename[0] != '/') {
+		state.plugin_printf(SUDO_CONV_ERROR_MSG, "Relative path to cookie file is not allowed\n");
+		goto end;
+	}
 
 	ret = access(filename, R_OK | F_OK);
 	if(ret < 0) {
@@ -81,14 +87,19 @@ unmap_end:
 end:
 	return retbuf;
 }
-char* load_cookie() {
-	return load_cookie_from_file(COOKIE_FILE);
+char* load_cookie(const char* file) {
+	return load_cookie_from_file(file);
 }
 char* find_cookie_in_env(char* env_add[]) {
 	return find_env_by_key("SUDO_COOKIE=", env_add);
 }
 size_t remove_cookie_from_env(char** user_env_out) {
 	return remove_env_by_key("SUDO_COOKIE=", user_env_out);
+}
+char* find_cookie_file_in_options(char* const* plugin_options) {
+	if(plugin_options == NULL)
+		return NULL;
+	return find_env_by_key("cookie_file=", plugin_options);
 }
 
 char ** build_command_info(const char *command) {
@@ -103,6 +114,7 @@ char ** build_command_info(const char *command) {
 }
 
 int policy_open(unsigned int version, sudo_conv_t conversation, sudo_printf_t plugin_printf, char * const settings[], char * const user_info[], char * const user_env[], char * const plugin_options[]) {
+	char* cookie_file;
 	state.plugin_printf = plugin_printf;
 
 	if (SUDO_API_VERSION_GET_MAJOR(version) != SUDO_API_VERSION_MAJOR) {
@@ -111,6 +123,12 @@ int policy_open(unsigned int version, sudo_conv_t conversation, sudo_printf_t pl
 			SUDO_API_VERSION_GET_MAJOR(version),
 			SUDO_API_VERSION_GET_MINOR(version));
 		return -1;
+	}
+
+	if(cookie_file = find_cookie_file_in_options(plugin_options)) {
+		state.cookie_file = cookie_file;
+	} else {
+		state.cookie_file = default_cookie_file;
 	}
 
 	state.plugin_arge = user_env;
@@ -128,7 +146,7 @@ int policy_check(int argc, char * const argv[], char *env_add[], char **command_
 	char* env_cookie;
 	char* command;
 
-	cookie = load_cookie();
+	cookie = load_cookie(state.cookie_file);
 	if(cookie == NULL)
 		return -1;
 
