@@ -152,7 +152,7 @@ int policy_check(int argc, char * const argv[], char *env_add[], char **command_
 
 	*command_info = build_command_info(command);
 	*argv_out =  argv;
-	*user_env_out = state.plugin_arge;
+	*user_env_out = merge_env(state.plugin_arge, env_add);
 
 	free(command);
 	free(cookie);
