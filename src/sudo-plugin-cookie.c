@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 #include <sudo_plugin.h>
 
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "env.h"
 #include "path.h"
@@ -48,7 +50,7 @@ char* load_cookie_from_file(const char* filename) {
 		state.plugin_printf(SUDO_CONV_ERROR_MSG, "Cookie file is not owned by uid=0\n");
 		goto end;
 	}
-	if(st.st_mode & 0777 != 0600) {
+	if((st.st_mode & 0777) != 0600) {
 		state.plugin_printf(SUDO_CONV_ERROR_MSG, "Cookie file has wrong access permissions %o\n", st.st_mode);
 		goto end;
 	}
@@ -125,7 +127,7 @@ int policy_open(unsigned int version, sudo_conv_t conversation, sudo_printf_t pl
 		return -1;
 	}
 
-	if(cookie_file = find_cookie_file_in_options(plugin_options)) {
+	if((cookie_file = find_cookie_file_in_options(plugin_options))) {
 		state.cookie_file = cookie_file;
 	} else {
 		state.cookie_file = default_cookie_file;
