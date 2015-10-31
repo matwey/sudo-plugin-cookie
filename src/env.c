@@ -3,7 +3,7 @@
 
 #include "env.h"
 
-char* find_env_by_key(const char* key, char* arge[]) {
+char* find_env_by_key(const char* key, char* const* arge) {
 	size_t keylen;
 	keylen = strlen(key);
 	for(; *arge != NULL; ++arge) {

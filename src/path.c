@@ -27,7 +27,7 @@ char* resolve_path2(const char* file, const char* path) {
 	return NULL;
 }
 
-char* resolve_path(const char* file, char* arge[]) {
+char* resolve_path(const char* file, char* const* arge) {
 	char* path;
 	path = find_env_by_key("PATH=", arge);
 
