@@ -14,6 +14,18 @@ char* find_env_by_key(const char* key, char* const* arge) {
 	}
 	return NULL;
 }
+size_t remove_env_by_key(const char* key, char** arge) {
+	char** arge2;
+	size_t keylen;
+	keylen = strlen(key);
+	for(arge2 = arge; *arge != NULL; ++arge) {
+		if(strncmp(*arge, key, keylen) != 0) {
+			*(arge2++) = *arge;
+		}
+	}
+	*(arge2++) = NULL;
+	return arge - arge2;
+}
 char** merge_env(char* const* arge, char* const* arge2) {
 	size_t i = 0;
 	size_t len = 0;

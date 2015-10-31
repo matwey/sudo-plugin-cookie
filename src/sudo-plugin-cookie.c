@@ -87,6 +87,9 @@ char* load_cookie() {
 char* find_cookie_in_env(char* env_add[]) {
 	return find_env_by_key("SUDO_COOKIE=", env_add);
 }
+size_t remove_cookie_from_env(char** user_env_out) {
+	return remove_env_by_key("SUDO_COOKIE=", user_env_out);
+}
 
 char ** build_command_info(const char *command) {
 	char **command_info;
@@ -153,6 +156,8 @@ int policy_check(int argc, char * const argv[], char *env_add[], char **command_
 	*command_info = build_command_info(command);
 	*argv_out =  argv;
 	*user_env_out = merge_env(state.plugin_arge, env_add);
+
+	remove_cookie_from_env(*user_env_out);
 
 	free(command);
 	free(cookie);
