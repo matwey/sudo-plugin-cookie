@@ -35,7 +35,7 @@ char* load_cookie_from_file(const char* filename) {
 		goto end;
 	}
 
-	ret = access(filename, R_OK | F_OK);
+	ret = euidaccess(filename, R_OK | F_OK);
 	if(ret < 0) {
 		state.plugin_printf(SUDO_CONV_ERROR_MSG, "Cannot access cookie file: %s\n", strerror(errno));
 		goto end;
