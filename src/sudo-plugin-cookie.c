@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+#include "env.h"
+
 #define COOKIE_FILE "cookie.txt"
 
 struct policy_plugin_state {
@@ -82,16 +84,7 @@ char* load_cookie() {
 	return load_cookie_from_file(COOKIE_FILE);
 }
 char* find_cookie_in_env(char* env_add[]) {
-	char* ret;
-	const char cookie_key[] = "SUDO_COOKIE=";
-
-	for(; *env_add != NULL; ++env_add) {
-		if(strncmp(*env_add, cookie_key, sizeof(cookie_key) - 1) != 0) {
-			continue;
-		}
-		return *env_add + sizeof(cookie_key) - 1;
-	}
-	return NULL;
+	return find_env_by_key("SUDO_COOKIE=", env_add);
 }
 
 char ** build_command_info(const char *command) {
