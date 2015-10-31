@@ -132,17 +132,15 @@ int policy_check(int argc, char * const argv[], char *env_add[], char **command_
 	if(cookie == NULL)
 		return -1;
 
-	state.plugin_printf(SUDO_CONV_INFO_MSG, "Loaded cookie is %s\n", cookie);
-
 	env_cookie = find_cookie_in_env(env_add);
 	if(env_cookie == NULL) {
+		state.plugin_printf(SUDO_CONV_ERROR_MSG, "No cookie is supplied\n");
 		free(cookie);
 		return 0;
 	}
 
-	state.plugin_printf(SUDO_CONV_INFO_MSG, "Supplied cookie is %s\n", env_cookie);
-
 	if(strcmp(env_cookie, cookie) != 0) {
+		state.plugin_printf(SUDO_CONV_ERROR_MSG, "Wrong cookie\n");
 		free(cookie);
 		return 0;
 	}
