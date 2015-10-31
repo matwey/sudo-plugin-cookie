@@ -9,6 +9,7 @@
 #include <fcntl.h>
 
 #include "env.h"
+#include "path.h"
 
 #define COOKIE_FILE "cookie.txt"
 
@@ -122,6 +123,7 @@ int policy_version(int verbose) {
 int policy_check(int argc, char * const argv[], char *env_add[], char **command_info[], char **argv_out[], char **user_env_out[]) {
 	char* cookie;
 	char* env_cookie;
+	char* command;
 
 	cookie = load_cookie();
 	if(cookie == NULL)
@@ -142,10 +144,17 @@ int policy_check(int argc, char * const argv[], char *env_add[], char **command_
 		return 0;
 	}
 
-	*command_info = build_command_info(argv[0]);
+	command = resolve_path(argv[0], state.plugin_arge);
+	if(command == NULL) {
+		free(cookie);
+		return -1;
+	}
+
+	*command_info = build_command_info(command);
 	*argv_out =  argv;
 	*user_env_out = state.plugin_arge;
 
+	free(command);
 	free(cookie);
 	return 1;
 }
