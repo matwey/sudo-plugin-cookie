@@ -83,17 +83,13 @@ char* load_cookie() {
 }
 char* find_cookie_in_env(char* env_add[]) {
 	char* ret;
-	const char cookie_key[] = "SUDO_COOKIE";
+	const char cookie_key[] = "SUDO_COOKIE=";
 
 	for(; *env_add != NULL; ++env_add) {
-		if(strncmp(*env_add, cookie_key, sizeof(cookie_key)-1) != 0) {
+		if(strncmp(*env_add, cookie_key, sizeof(cookie_key) - 1) != 0) {
 			continue;
 		}
-		ret = strchr(*env_add, '=');
-		if(ret != NULL) {
-			return ret+1;
-		}
-		env_add++;
+		return *env_add + sizeof(cookie_key) - 1;
 	}
 	return NULL;
 }
