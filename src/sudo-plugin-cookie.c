@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sudo_plugin.h>
+#include <ctype.h>
 
 #include <sys/mman.h>
 #include <sys/stat.h>
